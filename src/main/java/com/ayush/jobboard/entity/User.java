@@ -6,8 +6,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -18,19 +24,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@JsonPropertyOrder({
-        "id",
-        "name",
-        "email",
-        "role",
-        "phone",
-        "location",
-        "bio",
-        "resumeUrl",
-        "createdAt",
-        "updatedAt"
-})
-public class User {
+
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -63,4 +58,25 @@ public class User {
     @UpdateTimestamp
     private Instant updatedAt;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

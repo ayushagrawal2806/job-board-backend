@@ -1,6 +1,7 @@
 package com.ayush.jobboard.service;
 
-import com.ayush.jobboard.dto.Job.CreateJobRequestDto;
+
+import com.ayush.jobboard.dto.Job.JobRequestDto;
 import com.ayush.jobboard.dto.Job.JobResponseDto;
 import com.ayush.jobboard.entity.Job;
 import com.ayush.jobboard.entity.User;
@@ -29,7 +30,7 @@ public class JobService {
     private final JobMapper jobMapper;
 
 
-    public JobResponseDto createJob(CreateJobRequestDto request) {
+    public JobResponseDto createJob(JobRequestDto request) {
 
         User user = getCurrentUser();
         Job job = Job.builder()
@@ -48,7 +49,7 @@ public class JobService {
 
     }
 
-    public  JobResponseDto updateJob(CreateJobRequestDto request , UUID id) {
+    public  JobResponseDto updateJob(JobRequestDto request , UUID id) {
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No job found with id : " + id));
         User user = getCurrentUser();

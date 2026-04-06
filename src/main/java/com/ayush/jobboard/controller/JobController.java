@@ -1,6 +1,7 @@
 package com.ayush.jobboard.controller;
 
-import com.ayush.jobboard.dto.Job.CreateJobRequestDto;
+
+import com.ayush.jobboard.dto.Job.JobRequestDto;
 import com.ayush.jobboard.dto.Job.JobResponseDto;
 import com.ayush.jobboard.service.JobService;
 import jakarta.validation.Valid;
@@ -23,13 +24,13 @@ public class JobController {
 
     @PreAuthorize("hasRole('RECRUITER')")
     @PostMapping
-    public ResponseEntity<JobResponseDto> createJob(@Valid @RequestBody CreateJobRequestDto createJobRequestDto){
-        return ResponseEntity.ok(jobService.createJob(createJobRequestDto));
+    public ResponseEntity<JobResponseDto> createJob(@Valid @RequestBody JobRequestDto jobRequestDto){
+        return ResponseEntity.ok(jobService.createJob(jobRequestDto));
     }
 
     @PreAuthorize("hasRole('RECRUITER')")
     @PutMapping(path = "/{id}")
-    public ResponseEntity<JobResponseDto> updateJob(@Valid @RequestBody CreateJobRequestDto createJobRequestDto , @PathVariable UUID id){
-        return ResponseEntity.ok(jobService.updateJob(createJobRequestDto , id));
+    public ResponseEntity<JobResponseDto> updateJob(@Valid @RequestBody JobRequestDto jobRequestDto , @PathVariable UUID id){
+        return ResponseEntity.ok(jobService.updateJob(jobRequestDto , id));
     }
 }

@@ -1,14 +1,12 @@
 package com.ayush.jobboard.dto.Job;
 
-import com.ayush.jobboard.enums.JobStatus;
 import com.ayush.jobboard.enums.JobType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import lombok.Data;
 
 @Data
-public class CreateJobRequestDto {
+public class JobRequestDto {
     @NotBlank(message = "title is required")
     private String title;
 

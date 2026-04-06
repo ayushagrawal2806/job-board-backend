@@ -7,6 +7,7 @@ import com.ayush.jobboard.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +27,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(path = "/login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginRequestDto user , HttpServletResponse response){
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginRequestDto user , HttpServletResponse response){
         return ResponseEntity.ok(authService.login(user , response));
     }
 
 
     @PostMapping(path = "/signup")
-    public ResponseEntity<AuthResponseDto> signUp(@RequestBody SignupRequestDto user , HttpServletResponse response){
+    public ResponseEntity<AuthResponseDto> signUp(@Valid @RequestBody SignupRequestDto user , HttpServletResponse response){
         return  new ResponseEntity<>(authService.signUp(user , response) , HttpStatus.CREATED);
     }
 

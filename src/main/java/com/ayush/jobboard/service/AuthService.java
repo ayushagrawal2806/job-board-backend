@@ -64,23 +64,15 @@ public class AuthService {
                 .name(signUpRequest.getName())
                 .role(signUpRequest.getRole())
                 .build();
-        User user =  userRepository.save(result);
-        String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        response.addCookie(refreshTokenCookie);
-
-
-        return AuthResponseDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .build();
+        userRepository.save(result);
+        // here we are doing auto login
+        return login(
+                LoginRequestDto.builder()
+                        .email(signUpRequest.getEmail())
+                        .password(signUpRequest.getPassword())
+                        .build(),
+                response
+        );
     };
 
     public  AuthResponseDto refresh(String refreshToken) {

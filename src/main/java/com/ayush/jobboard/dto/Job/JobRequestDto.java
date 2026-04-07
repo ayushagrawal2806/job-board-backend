@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class JobRequestDto {
     @NotBlank(message = "title is required")
@@ -21,6 +23,12 @@ public class JobRequestDto {
 
     @NotBlank(message = "description is required")
     private String description;
+
+    @NotNull(message = "min experience is required")
+    private BigDecimal minExperience;
+
+    @NotNull(message = "max experience is required")
+    private BigDecimal maxExperience;
 
     private Integer salaryMin;
 

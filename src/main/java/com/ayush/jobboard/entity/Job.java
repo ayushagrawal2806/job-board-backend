@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -45,6 +46,12 @@ public class Job {
 
     private Integer salaryMin;
     private Integer salaryMax;
+
+    @Column(precision = 3 , scale = 1, nullable = false)
+    private BigDecimal minExperience;
+
+    @Column(precision = 3 , scale = 1, nullable = false)
+    private BigDecimal maxExperience;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

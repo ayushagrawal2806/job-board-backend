@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -19,6 +20,8 @@ import java.util.UUID;
         "location",
         "type",
         "description",
+        "minExperience",
+        "maxExperience",
         "salaryMin",
         "salaryMax",
         "status",
@@ -34,6 +37,8 @@ public class JobResponseDto {
     private String location;
     private JobType type;
     private String description;
+    private BigDecimal minExperience;
+    private BigDecimal maxExperience;
     private Integer salaryMin;
     private Integer salaryMax;
     private JobStatus status;

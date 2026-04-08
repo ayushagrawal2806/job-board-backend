@@ -1,19 +1,28 @@
 package com.ayush.jobboard.service;
 
 
+import com.ayush.jobboard.dto.Job.JobApplyRequestDto;
+import com.ayush.jobboard.dto.Job.JobFilterDto;
 import com.ayush.jobboard.dto.Job.JobRequestDto;
 import com.ayush.jobboard.dto.Job.JobResponseDto;
+import com.ayush.jobboard.entity.Application;
 import com.ayush.jobboard.entity.Job;
 import com.ayush.jobboard.entity.User;
+import com.ayush.jobboard.enums.ApplicationStatus;
 import com.ayush.jobboard.enums.JobStatus;
 import com.ayush.jobboard.exceptions.AccessDeniedException;
+import com.ayush.jobboard.exceptions.AlreadyAppliedException;
+import com.ayush.jobboard.exceptions.JobClosedException;
 import com.ayush.jobboard.exceptions.ResourceNotFoundException;
 import com.ayush.jobboard.mapper.JobMapper;
+import com.ayush.jobboard.repository.ApplicationRepository;
 import com.ayush.jobboard.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -32,6 +41,7 @@ public class JobService {
 
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
+    private final ApplicationRepository applicationRepository;
 
 
     public JobResponseDto createJob(JobRequestDto request) {
@@ -102,5 +112,51 @@ public class JobService {
                 .orElseThrow(() -> new ResourceNotFoundException("Job with id '" + jobId + "' not found"));
 
         return jobMapper.toDto(job);
+    }
+
+    public Page<JobResponseDto> filterJobs(JobFilterDto filter, Pageable pageable) {
+
+        Page<Job> jobs = jobRepository.filterJobs(
+                filter.getLocation(),
+                filter.getType(),
+                filter.getCompany(),
+                filter.getSalaryMin(),
+                filter.getSalaryMax(),
+                pageable
+        );
+
+        return jobs.map(jobMapper::toDto);
+    }
+
+    public void apply(JobApplyRequestDto applyRequestDto, UUID jobId) {
+
+        User user = getCurrentUser();
+
+        Job job =  jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job with id '" + jobId + "' not found"));
+
+        if(!job.getStatus().equals(JobStatus.OPEN)){
+            throw new JobClosedException("Job is no longer accepting applications");
+        }
+
+        boolean alreadyApplied = applicationRepository.existsByApplicantIdAndJobId(user.getId(), jobId);
+        if (alreadyApplied) {
+            throw new AlreadyAppliedException("You have already applied for this job");
+        }
+
+
+
+
+
+        Application application = Application.builder()
+                .applicant(user)
+                .job(job)
+                .resumeUrl(applyRequestDto != null ? applyRequestDto.getResumeUrl() : null)
+                .coverLetter(applyRequestDto != null ? applyRequestDto.getCoverLetter() : null)
+                .status(ApplicationStatus.APPLIED)
+                .build();
+
+        applicationRepository.save(application);
+
     }
 }

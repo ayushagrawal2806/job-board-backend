@@ -1,12 +1,16 @@
 package com.ayush.jobboard.controller;
 
 import com.ayush.jobboard.common.ApiResponse;
+import com.ayush.jobboard.dto.Job.JobApplyRequestDto;
+import com.ayush.jobboard.dto.Job.JobFilterDto;
 import com.ayush.jobboard.dto.Job.JobRequestDto;
 import com.ayush.jobboard.dto.Job.JobResponseDto;
 import com.ayush.jobboard.service.JobService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -89,6 +93,39 @@ public class JobController {
                 .message("Jobs fetched successfully")
                 .data(jobs)
                 .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponse<Page<JobResponseDto>>> filterJobs(
+            @ModelAttribute JobFilterDto filter,
+            Pageable pageable
+    ) {
+        // when we are sending request there are two params called size and page
+        // size : means that in a page how many elements will be there
+        // page : page number of the page so it will open that page starts from 0
+        Page<JobResponseDto> jobs = jobService.filterJobs(filter, pageable);
+
+        ApiResponse<Page<JobResponseDto>> response = ApiResponse.<Page<JobResponseDto>>builder()
+                .message("Jobs fetched successfully")
+                .data(jobs)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PreAuthorize("hasRole('SEEKER')")
+    @PostMapping("/{jobId}/apply")
+    public ResponseEntity<ApiResponse<Void>> applyJob(@RequestBody(required = false) JobApplyRequestDto applyRequestDto ,
+                                                      @PathVariable UUID jobId){
+
+        jobService.apply(applyRequestDto , jobId);
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .message("Application submitted successfully")
+                .build();
+
 
         return ResponseEntity.ok(response);
     }

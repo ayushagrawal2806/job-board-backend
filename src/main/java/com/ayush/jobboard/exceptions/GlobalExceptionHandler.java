@@ -77,11 +77,31 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex){
         return buildErrorResponse(
-                "Something went wrong",
+                "Something went wrong" + ex.getLocalizedMessage(),
                 "INTERNAL_SERVER_ERROR",
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 null
         );
+    }
+
+    @ExceptionHandler(AlreadyAppliedException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyAppliedException(AlreadyAppliedException ex){
+        return buildErrorResponse(
+                ex.getMessage(),
+                "ALREADY_APPLIED",
+                HttpStatus.CONFLICT,
+                null
+        );
+    }
+
+    @ExceptionHandler(JobClosedException.class)
+    public ResponseEntity<ErrorResponse> handleJobNotOpenException(Exception ex){
+        return buildErrorResponse(
+                ex.getMessage(),
+                "JOB_NOT_OPEN",
+                HttpStatus.CONFLICT,
+                null
+                );
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(

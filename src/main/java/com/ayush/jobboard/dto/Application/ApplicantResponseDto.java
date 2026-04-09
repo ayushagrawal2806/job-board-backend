@@ -12,20 +12,22 @@ import java.util.UUID;
 @Builder
 @JsonPropertyOrder({
         "applicationId",
-        "jobId",
-        "jobTitle",
-        "company",
-        "location",
+        "applicantId",
+        "name",
+        "email",
+        "resumeUrl",
+        "coverLetter",
         "status",
         "appliedAt"
 })
-public class ApplicationResponseDto {
+public class ApplicantResponseDto {
 
+    private UUID applicantId;
     private UUID applicationId;
-    private UUID jobId;
-    private String jobTitle;
-    private String company;
-    private String location;
+    private String name;
+    private String email;
+    private String resumeUrl;
+    private String coverLetter;
     private ApplicationStatus status;
     private Instant appliedAt;
 

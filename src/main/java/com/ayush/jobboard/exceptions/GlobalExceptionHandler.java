@@ -50,12 +50,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex){
         return buildErrorResponse(
-                "Access denied",
+                ex.getMessage(),
                 "FORBIDDEN",
                 HttpStatus.FORBIDDEN,
                 null
         );
     }
+
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex){
@@ -74,15 +76,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex){
-        return buildErrorResponse(
-                "Something went wrong" + ex.getLocalizedMessage(),
-                "INTERNAL_SERVER_ERROR",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                null
-        );
-    }
 
     @ExceptionHandler(AlreadyAppliedException.class)
     public ResponseEntity<ErrorResponse> handleAlreadyAppliedException(AlreadyAppliedException ex){
@@ -95,14 +88,36 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(JobClosedException.class)
-    public ResponseEntity<ErrorResponse> handleJobNotOpenException(Exception ex){
+    public ResponseEntity<ErrorResponse> handleJobNotOpenException(JobClosedException ex){
         return buildErrorResponse(
                 ex.getMessage(),
                 "JOB_NOT_OPEN",
                 HttpStatus.CONFLICT,
                 null
-                );
+        );
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex){
+        return buildErrorResponse(
+                ex.getMessage(),
+                "INVALID_STATE",
+                HttpStatus.BAD_REQUEST,
+                null
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex){
+        return buildErrorResponse(
+                "Something went wrong" + ex.getLocalizedMessage(),
+                "INTERNAL_SERVER_ERROR",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                null
+        );
+    }
+
+
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             String message,

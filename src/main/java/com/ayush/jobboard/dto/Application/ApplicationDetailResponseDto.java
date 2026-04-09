@@ -16,17 +16,30 @@ import java.util.UUID;
         "jobTitle",
         "company",
         "location",
+        "applicantId",
+        "applicantName",
+        "applicantEmail",
+        "resumeUrl",
+        "coverLetter",
         "status",
         "appliedAt"
 })
-public class ApplicationResponseDto {
+public class ApplicationDetailResponseDto {
 
     private UUID applicationId;
+
     private UUID jobId;
     private String jobTitle;
     private String company;
     private String location;
+
+    private UUID applicantId;
+    private String applicantName;
+    private String applicantEmail;
+
+    private String resumeUrl;
+    private String coverLetter;
+
     private ApplicationStatus status;
     private Instant appliedAt;
-
 }

@@ -18,4 +18,5 @@ public interface ApplicationRepository extends JpaRepository<Application , UUID>
 
     Page<Application> findByApplicantId(UUID id , Pageable pageable);
 
+    Page<Application> findByJobId(UUID jobId, Pageable pageable);
 }

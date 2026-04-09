@@ -3,8 +3,12 @@ package com.ayush.jobboard.controller;
 
 import com.ayush.jobboard.common.ApiResponse;
 
+import com.ayush.jobboard.dto.Application.ApplicantResponseDto;
+import com.ayush.jobboard.dto.Application.ApplicationDetailResponseDto;
 import com.ayush.jobboard.dto.Application.ApplicationResponseDto;
+import com.ayush.jobboard.dto.Application.ApplicationUpdateRequestDto;
 import com.ayush.jobboard.service.ApplicationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +52,33 @@ public class ApplicationController {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Application withdrawn successfully")
                 .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('RECRUITER')")
+    @PatchMapping("/{applicationId}/status")
+    public ResponseEntity<ApiResponse<Void>> updateApplicationStatus(@PathVariable UUID applicationId ,
+                                                                     @Valid @RequestBody ApplicationUpdateRequestDto requestDto){
+        applicationService.updateApplicationStatus(applicationId , requestDto);
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .message("Application status updated successfully")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{applicationId}")
+    public ResponseEntity<ApiResponse<ApplicationDetailResponseDto>> getApplicationDetails(@PathVariable UUID applicationId){
+
+
+        ApplicationDetailResponseDto applicationDetails = applicationService.getApplicationDetails(applicationId);
+        ApiResponse<ApplicationDetailResponseDto> response = ApiResponse.<ApplicationDetailResponseDto>builder()
+                .message("Application fetched successfully")
+                .data(applicationDetails)
+                .build();
+
 
         return ResponseEntity.ok(response);
     }

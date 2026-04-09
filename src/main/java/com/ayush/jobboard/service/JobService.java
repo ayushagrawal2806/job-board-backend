@@ -1,6 +1,7 @@
 package com.ayush.jobboard.service;
 
 
+import com.ayush.jobboard.dto.Application.ApplicantResponseDto;
 import com.ayush.jobboard.dto.Job.JobApplyRequestDto;
 import com.ayush.jobboard.dto.Job.JobFilterDto;
 import com.ayush.jobboard.dto.Job.JobRequestDto;
@@ -10,19 +11,18 @@ import com.ayush.jobboard.entity.Job;
 import com.ayush.jobboard.entity.User;
 import com.ayush.jobboard.enums.ApplicationStatus;
 import com.ayush.jobboard.enums.JobStatus;
-import com.ayush.jobboard.exceptions.AccessDeniedException;
-import com.ayush.jobboard.exceptions.AlreadyAppliedException;
-import com.ayush.jobboard.exceptions.JobClosedException;
-import com.ayush.jobboard.exceptions.ResourceNotFoundException;
+import com.ayush.jobboard.exceptions.*;
 import com.ayush.jobboard.mapper.JobMapper;
 import com.ayush.jobboard.repository.ApplicationRepository;
 import com.ayush.jobboard.repository.JobRepository;
+import com.ayush.jobboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 
@@ -42,6 +42,7 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
     private final ApplicationRepository applicationRepository;
+    private final UserRepository userRepository;
 
 
     public JobResponseDto createJob(JobRequestDto request) {
@@ -89,7 +90,7 @@ public class JobService {
         User user = getCurrentUser();
 
         if(!job.getRecruiter().getId().equals(user.getId())){
-            throw new AccessDeniedException( "You are not authorized to update this job posting");
+            throw new AccessDeniedException( "You are not authorized to delete this job posting");
         }
 
         jobRepository.delete(job);
@@ -144,19 +145,58 @@ public class JobService {
             throw new AlreadyAppliedException("You have already applied for this job");
         }
 
+        String resumeUrl = user.getResumeUrl();
 
+        if (resumeUrl == null || resumeUrl.isBlank()) {
 
+            if (applyRequestDto == null ||
+                    applyRequestDto.getResumeUrl() == null ||
+                    applyRequestDto.getResumeUrl().isBlank()) {
 
+                throw new IllegalStateException(
+                        "A resume link is required to apply for this job. Please add it to your profile or provide it in the application."
+                );
+            }
+
+            resumeUrl = applyRequestDto.getResumeUrl();
+
+            user.setResumeUrl(resumeUrl);
+            userRepository.save(user);
+        }
 
         Application application = Application.builder()
                 .applicant(user)
                 .job(job)
-                .resumeUrl(applyRequestDto != null ? applyRequestDto.getResumeUrl() : null)
+                .resumeUrl(resumeUrl)
                 .coverLetter(applyRequestDto != null ? applyRequestDto.getCoverLetter() : null)
                 .status(ApplicationStatus.APPLIED)
                 .build();
 
         applicationRepository.save(application);
 
+    }
+
+    public Page<ApplicantResponseDto> getApplicantsForJob(UUID jobId , Pageable pageable){
+        User recruiter = getCurrentUser();
+
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job with id '" + jobId + "' not found"));
+
+        if (!job.getRecruiter().getId().equals(recruiter.getId())) {
+            throw new UnAuthorizedException("You are not allowed to view applicants for this job");
+        }
+        Page<Application> applications = applicationRepository.findByJobId(jobId , pageable);
+
+        return applications
+                .map(application -> ApplicantResponseDto.builder()
+                        .applicantId(application.getApplicant().getId())
+                        .applicationId(application.getId())
+                        .name(application.getApplicant().getName())
+                        .email(application.getApplicant().getEmail())
+                        .resumeUrl(application.getResumeUrl())
+                        .coverLetter(application.getCoverLetter())
+                        .status(application.getStatus())
+                        .appliedAt(application.getCreatedAt())
+                        .build());
     }
 }

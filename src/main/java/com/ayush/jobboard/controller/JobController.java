@@ -1,6 +1,7 @@
 package com.ayush.jobboard.controller;
 
 import com.ayush.jobboard.common.ApiResponse;
+import com.ayush.jobboard.dto.Application.ApplicantResponseDto;
 import com.ayush.jobboard.dto.Job.JobApplyRequestDto;
 import com.ayush.jobboard.dto.Job.JobFilterDto;
 import com.ayush.jobboard.dto.Job.JobRequestDto;
@@ -124,6 +125,20 @@ public class JobController {
         jobService.apply(applyRequestDto , jobId);
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .message("Application submitted successfully")
+                .build();
+
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('RECRUITER')")
+    @GetMapping("/{jobId}/applications")
+    public ResponseEntity<ApiResponse<Page<ApplicantResponseDto>>> getAllApplicantsForJob(@PathVariable UUID jobId , Pageable pageable){
+
+       Page<ApplicantResponseDto> applicants = jobService.getApplicantsForJob(jobId , pageable);
+        ApiResponse<Page<ApplicantResponseDto>> response = ApiResponse.<Page<ApplicantResponseDto>>builder()
+                .message("Applicants fetched successfully")
+                .data(applicants)
                 .build();
 
 

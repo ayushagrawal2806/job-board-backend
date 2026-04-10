@@ -8,6 +8,7 @@ import com.ayush.jobboard.dto.Job.JobRequestDto;
 import com.ayush.jobboard.dto.Job.JobResponseDto;
 import com.ayush.jobboard.entity.Application;
 import com.ayush.jobboard.entity.Job;
+import com.ayush.jobboard.entity.SavedJob;
 import com.ayush.jobboard.entity.User;
 import com.ayush.jobboard.enums.ApplicationStatus;
 import com.ayush.jobboard.enums.JobStatus;
@@ -15,6 +16,7 @@ import com.ayush.jobboard.exceptions.*;
 import com.ayush.jobboard.mapper.JobMapper;
 import com.ayush.jobboard.repository.ApplicationRepository;
 import com.ayush.jobboard.repository.JobRepository;
+import com.ayush.jobboard.repository.SavedJobRespository;
 import com.ayush.jobboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.util.List;
 
 import java.util.UUID;
@@ -43,7 +46,7 @@ public class JobService {
     private final JobMapper jobMapper;
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
-
+    private final SavedJobRespository savedJobRespository;
 
     public JobResponseDto createJob(JobRequestDto request) {
 
@@ -198,5 +201,50 @@ public class JobService {
                         .status(application.getStatus())
                         .appliedAt(application.getCreatedAt())
                         .build());
+    }
+
+    public void saveJob(UUID jobId) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job with id '" + jobId + "' not found"));
+        User user = getCurrentUser();
+
+        boolean isExists = savedJobRespository.existsByJobIdAndUserId(job.getId() , user.getId());
+        if(isExists){
+            throw new AlreadySavedJobException("Job is Already Saved");
+        }
+
+        SavedJob save = SavedJob.builder()
+                .job(job)
+                .user(user)
+                .build();
+
+        savedJobRespository.save(save);
+    }
+
+    public Page<JobResponseDto> getSavedJobs(Pageable pageable) {
+
+        User user = getCurrentUser();
+
+        Page<SavedJob> savedJobs = savedJobRespository.findByUserId(user.getId(), pageable);
+
+        return savedJobs.map(savedJob -> JobResponseDto.builder()
+                .id(savedJob.getJob().getId())
+                .title(savedJob.getJob().getTitle())
+                .company(savedJob.getJob().getCompany())
+                .location(savedJob.getJob().getLocation())
+                .type(savedJob.getJob().getType())
+                .salaryMin(savedJob.getJob().getSalaryMin())
+                .salaryMax(savedJob.getJob().getSalaryMax())
+                .status(savedJob.getJob().getStatus())
+                .createdAt(savedJob.getJob().getCreatedAt())
+                .updatedAt(savedJob.getJob().getUpdatedAt())
+                .build());
+    }
+
+    public void deleteSavedJob(UUID jobId) {;
+        User user = getCurrentUser();
+        SavedJob savedJob = savedJobRespository.findByJobIdAndUserId(jobId , user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Saved job not found"));;
+        savedJobRespository.delete(savedJob);
     }
 }

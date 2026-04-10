@@ -87,6 +87,16 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(AlreadySavedJobException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadySavedJobException(AlreadySavedJobException ex){
+        return buildErrorResponse(
+                ex.getMessage(),
+                "ALREADY_SAVED",
+                HttpStatus.CONFLICT,
+                null
+        );
+    }
+
     @ExceptionHandler(JobClosedException.class)
     public ResponseEntity<ErrorResponse> handleJobNotOpenException(JobClosedException ex){
         return buildErrorResponse(

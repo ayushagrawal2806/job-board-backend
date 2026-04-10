@@ -144,4 +144,42 @@ public class JobController {
 
         return ResponseEntity.ok(response);
     }
+
+    // Save job
+
+    @PreAuthorize("hasRole('SEEKER')")
+    @PostMapping("/{jobId}/save")
+    public ResponseEntity<ApiResponse<Void>> saveJob(@PathVariable UUID jobId){
+        jobService.saveJob(jobId);
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .message("Job saved successfully")
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('SEEKER')")
+    @DeleteMapping("/{jobId}/save")
+    public ResponseEntity<ApiResponse<Void>> deleteSavedJob(@PathVariable UUID jobId){
+        jobService.deleteSavedJob(jobId);
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .message("Job unsaved successfully")
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('SEEKER')")
+    @GetMapping("/saved")
+    public ResponseEntity<ApiResponse<Page<JobResponseDto>>> getSavedJobs(Pageable pageable) {
+
+        Page<JobResponseDto> jobs = jobService.getSavedJobs(pageable);
+
+        ApiResponse<Page<JobResponseDto>> response = ApiResponse.<Page<JobResponseDto>>builder()
+                .message("Saved jobs fetched successfully")
+                .data(jobs)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

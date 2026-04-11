@@ -4,7 +4,11 @@ import com.ayush.jobboard.Security.JWTService;
 import com.ayush.jobboard.dto.Auth.AuthResponseDto;
 import com.ayush.jobboard.dto.Auth.LoginRequestDto;
 import com.ayush.jobboard.dto.Auth.SignupRequestDto;
+import com.ayush.jobboard.dto.Auth.UserResponseDto;
+import com.ayush.jobboard.dto.Profile.ProfileResponseDto;
 import com.ayush.jobboard.entity.User;
+import com.ayush.jobboard.mapper.ProfileMapper;
+import com.ayush.jobboard.mapper.UserMapper;
 import com.ayush.jobboard.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,6 +32,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final UserMapper userMapper;
 
     public AuthResponseDto login( LoginRequestDto loginRequestDto , HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
@@ -35,10 +40,10 @@ public class AuthService {
         );
 
         User result = (User) authentication.getPrincipal();
+        UserResponseDto userResponseDto = userMapper.toDto(result);
 
         String accessToken = jwtService.generateAccessToken(result);
         String refreshToken = jwtService.generateRefreshToken(result);
-
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
@@ -46,10 +51,11 @@ public class AuthService {
         return AuthResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .id(result.getId())
-                .name(result.getName())
-                .email(result.getEmail())
-                .role(result.getRole())
+                .user(userResponseDto)
+//                .id(result.getId())
+//                .name(result.getName())
+//                .email(result.getEmail())
+//                .role(result.getRole())
                 .build();
     }
 
@@ -81,13 +87,15 @@ public class AuthService {
 
         User user = userRepository.findById(userIdFromToken).orElseThrow();
         String accessToken = jwtService.generateAccessToken(user);
+        UserResponseDto userResponseDto = userMapper.toDto(user);
 
         return AuthResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
+                .user(userResponseDto)
+//                .id(user.getId())
+//                .name(user.getName())
+//                .email(user.getEmail())
                 .build();
 
 

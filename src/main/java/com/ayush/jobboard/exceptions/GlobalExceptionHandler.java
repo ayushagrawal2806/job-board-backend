@@ -117,10 +117,22 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex) {
+
+        return buildErrorResponse(
+                ex.getMessage(),
+                "BAD_REQUEST",
+                HttpStatus.BAD_REQUEST,
+                null
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex){
         return buildErrorResponse(
-                "Something went wrong" + ex.getLocalizedMessage(),
+                "Something went wrong",
                 "INTERNAL_SERVER_ERROR",
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 null

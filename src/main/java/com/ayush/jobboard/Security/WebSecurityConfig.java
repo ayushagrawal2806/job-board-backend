@@ -39,6 +39,8 @@ public class WebSecurityConfig {
                         sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**" , "/health").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/job/filter").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/job/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

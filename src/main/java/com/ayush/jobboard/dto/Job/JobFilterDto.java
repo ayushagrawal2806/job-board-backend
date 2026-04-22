@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class JobFilterDto {
 
+    private String search;
     private String location;
     private JobType type;
     private Integer salaryMin;

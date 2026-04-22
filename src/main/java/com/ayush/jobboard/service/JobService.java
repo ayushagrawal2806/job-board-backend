@@ -121,6 +121,7 @@ public class JobService {
     public Page<JobResponseDto> filterJobs(JobFilterDto filter, Pageable pageable) {
 
         Page<Job> jobs = jobRepository.filterJobs(
+                filter.getSearch(),
                 filter.getLocation(),
                 filter.getType(),
                 filter.getCompany(),

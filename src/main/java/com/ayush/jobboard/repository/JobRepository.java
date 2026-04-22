@@ -16,13 +16,15 @@ public interface JobRepository extends JpaRepository<Job , UUID> {
 
     @Query("""
     SELECT j FROM Job j
-    WHERE (:location IS NULL OR j.location = :location)
+    WHERE (:search IS NULL OR LOWER(j.title) LIKE LOWER(CONCAT('%', :search, '%')))
+    AND (:location IS NULL OR j.location = :location)
     AND (:type IS NULL OR j.type = :type)
     AND (:company IS NULL OR j.company = :company)
     AND (:salaryMin IS NULL OR j.salaryMin >= :salaryMin)
     AND (:salaryMax IS NULL OR j.salaryMax <= :salaryMax)
     """)
     Page<Job> filterJobs(
+            String search,
             String location,
             JobType type,
             String company,

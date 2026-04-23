@@ -37,7 +37,7 @@ public class ApplicationService {
                 .appliedAt(application.getCreatedAt())
                 .jobTitle(application.getJob().getTitle())
                 .status(application.getStatus())
-                .company(application.getJob().getCompany())
+                .company(application.getJob().getCompanyName())
                 .location(application.getJob().getLocation())
                 .build());
     }
@@ -88,7 +88,7 @@ public class ApplicationService {
                 .applicationId(application.getId())
                 .jobId(application.getJob().getId())
                 .jobTitle(application.getJob().getTitle())
-                .company(application.getJob().getCompany())
+                .company(application.getJob().getCompanyName())
                 .location(application.getJob().getLocation())
                 .applicantId(application.getApplicant().getId())
                 .applicantName(application.getApplicant().getName())

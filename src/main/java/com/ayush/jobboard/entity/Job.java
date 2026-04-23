@@ -32,7 +32,7 @@ public class Job {
     private String title;
 
     @Column(nullable = false)
-    private String company;
+    private String companyName;
 
     @Column(nullable = false)
     private String location;
@@ -41,8 +41,8 @@ public class Job {
     @Column(nullable = false)
     private JobType type;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String description;
+    @Embedded
+    private JobAbout about;
 
     private Integer salaryMin;
     private Integer salaryMax;

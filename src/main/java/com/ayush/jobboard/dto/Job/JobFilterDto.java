@@ -11,5 +11,5 @@ public class JobFilterDto {
     private JobType type;
     private Integer salaryMin;
     private Integer salaryMax;
-    private String company;
+    private String companyName;
 }

@@ -13,7 +13,7 @@ public class JobRequestDto {
     private String title;
 
     @NotBlank(message = "company name is required")
-    private String company;
+    private String companyName;
 
     @NotBlank(message = "location is required")
     private String location;
@@ -21,8 +21,8 @@ public class JobRequestDto {
     @NotNull(message = "job type is required")
     private JobType type;
 
-    @NotBlank(message = "description is required")
-    private String description;
+    @NotNull(message = "about is required")
+    private JobAboutDto about;
 
     @NotNull(message = "min experience is required")
     private BigDecimal minExperience;

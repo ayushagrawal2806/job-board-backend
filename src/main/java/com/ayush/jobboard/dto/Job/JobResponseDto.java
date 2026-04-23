@@ -2,6 +2,8 @@ package com.ayush.jobboard.dto.Job;
 
 import com.ayush.jobboard.enums.JobStatus;
 import com.ayush.jobboard.enums.JobType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Data;
@@ -16,10 +18,10 @@ import java.util.UUID;
         "id",
         "recruiterId",
         "title",
-        "company",
+        "companyName",
         "location",
         "type",
-        "description",
+        "about",
         "minExperience",
         "maxExperience",
         "salaryMin",
@@ -28,15 +30,16 @@ import java.util.UUID;
         "createdAt",
         "updatedAt"
 })
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class JobResponseDto {
 
     private UUID id;
     private UUID recruiterId;
     private String title;
-    private String company;
+    private String companyName;
     private String location;
     private JobType type;
-    private String description;
+    private JobAboutDto about;
     private BigDecimal minExperience;
     private BigDecimal maxExperience;
     private Integer salaryMin;

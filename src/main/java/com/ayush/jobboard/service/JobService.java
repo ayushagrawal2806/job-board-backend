@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 
 
 import java.math.RoundingMode;
-import java.time.Instant;
 import java.util.List;
 
 import java.util.UUID;
@@ -53,10 +52,10 @@ public class JobService {
         User user = getCurrentUser();
         Job job = Job.builder()
                 .title(request.getTitle())
-                .company(request.getCompany())
+                .companyName(request.getCompanyName())
                 .location(request.getLocation())
                 .type(request.getType())
-                .description(request.getDescription())
+                .about(jobMapper.toEntity(request.getAbout()))
                 .minExperience(request.getMinExperience().setScale(1, RoundingMode.HALF_UP))
                 .maxExperience(request.getMaxExperience().setScale(1, RoundingMode.HALF_UP))
                 .salaryMin(request.getSalaryMin())
@@ -124,7 +123,7 @@ public class JobService {
                 filter.getSearch(),
                 filter.getLocation(),
                 filter.getType(),
-                filter.getCompany(),
+                filter.getCompanyName(),
                 filter.getSalaryMin(),
                 filter.getSalaryMax(),
                 pageable
@@ -231,10 +230,13 @@ public class JobService {
         return savedJobs.map(savedJob -> JobResponseDto.builder()
                 .id(savedJob.getJob().getId())
                 .title(savedJob.getJob().getTitle())
-                .company(savedJob.getJob().getCompany())
+                .companyName(savedJob.getJob().getCompanyName())
                 .location(savedJob.getJob().getLocation())
+                .about(jobMapper.toDto(savedJob.getJob().getAbout()))
                 .type(savedJob.getJob().getType())
                 .salaryMin(savedJob.getJob().getSalaryMin())
+                .minExperience(savedJob.getJob().getMinExperience())
+                .maxExperience(savedJob.getJob().getMaxExperience())
                 .salaryMax(savedJob.getJob().getSalaryMax())
                 .status(savedJob.getJob().getStatus())
                 .createdAt(savedJob.getJob().getCreatedAt())
@@ -242,10 +244,10 @@ public class JobService {
                 .build());
     }
 
-    public void deleteSavedJob(UUID jobId) {;
+    public void deleteSavedJob(UUID jobId) {
         User user = getCurrentUser();
         SavedJob savedJob = savedJobRespository.findByJobIdAndUserId(jobId , user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Saved job not found"));;
+                .orElseThrow(() -> new ResourceNotFoundException("Saved job not found"));
         savedJobRespository.delete(savedJob);
     }
 }

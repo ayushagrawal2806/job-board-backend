@@ -12,13 +12,13 @@ import lombok.*;
 @Builder
 public class JobAbout {
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String responsibilities;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String requirements;
 
     @Column(columnDefinition = "TEXT")
@@ -27,6 +27,6 @@ public class JobAbout {
     @Column(columnDefinition = "TEXT")
     private String companyAbout;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String skills;
 }

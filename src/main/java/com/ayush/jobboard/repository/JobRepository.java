@@ -17,7 +17,7 @@ public interface JobRepository extends JpaRepository<Job , UUID> {
     @Query("""
     SELECT j FROM Job j
     WHERE (:search IS NULL OR LOWER(j.title) LIKE %:search%)
-    AND (:location IS NULL OR LOWER(j.location) = LOWER(CAST(:location AS string)))
+    AND (:location IS NULL OR LOWER(j.location) LIKE %:location%)
     AND (:type IS NULL OR j.type = :type)
     AND (:companyName IS NULL OR j.companyName = :companyName)
     AND (:salaryMin IS NULL OR j.salaryMin >= :salaryMin)

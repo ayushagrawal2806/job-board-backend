@@ -2,10 +2,7 @@ package com.ayush.jobboard.service;
 
 
 import com.ayush.jobboard.dto.Application.ApplicantResponseDto;
-import com.ayush.jobboard.dto.Job.JobApplyRequestDto;
-import com.ayush.jobboard.dto.Job.JobFilterDto;
-import com.ayush.jobboard.dto.Job.JobRequestDto;
-import com.ayush.jobboard.dto.Job.JobResponseDto;
+import com.ayush.jobboard.dto.Job.*;
 import com.ayush.jobboard.entity.Application;
 import com.ayush.jobboard.entity.Job;
 import com.ayush.jobboard.entity.SavedJob;
@@ -18,6 +15,7 @@ import com.ayush.jobboard.repository.ApplicationRepository;
 import com.ayush.jobboard.repository.JobRepository;
 import com.ayush.jobboard.repository.SavedJobRespository;
 import com.ayush.jobboard.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +58,7 @@ public class JobService {
                 .maxExperience(request.getMaxExperience().setScale(1, RoundingMode.HALF_UP))
                 .salaryMin(request.getSalaryMin())
                 .salaryMax(request.getSalaryMax())
-                .status(JobStatus.OPEN)
+                .status(JobStatus.DRAFT)
                 .recruiter(user)
                 .build();
         job = jobRepository.save(job);
@@ -249,5 +247,19 @@ public class JobService {
         SavedJob savedJob = savedJobRespository.findByJobIdAndUserId(jobId , user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Saved job not found"));
         savedJobRespository.delete(savedJob);
+    }
+
+    public void updateJobStatus(@Valid JobStatusUpdateRequestDto jobStatusUpdateRequestDto, UUID jobId) {
+
+        User recruiter = getCurrentUser();
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job with id '" + jobId + "' not found"));
+
+        if(!recruiter.getId().equals(job.getRecruiter().getId())){
+            throw new AccessDeniedException( "You are not authorized to update the status of this job");
+        }
+
+        job.setStatus(jobStatusUpdateRequestDto.getStatus());
+        jobRepository.save(job);
     }
 }

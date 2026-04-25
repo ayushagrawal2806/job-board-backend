@@ -2,10 +2,7 @@ package com.ayush.jobboard.controller;
 
 import com.ayush.jobboard.common.ApiResponse;
 import com.ayush.jobboard.dto.Application.ApplicantResponseDto;
-import com.ayush.jobboard.dto.Job.JobApplyRequestDto;
-import com.ayush.jobboard.dto.Job.JobFilterDto;
-import com.ayush.jobboard.dto.Job.JobRequestDto;
-import com.ayush.jobboard.dto.Job.JobResponseDto;
+import com.ayush.jobboard.dto.Job.*;
 import com.ayush.jobboard.service.JobService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +63,21 @@ public class JobController {
         ApiResponse<JobResponseDto> response = ApiResponse.<JobResponseDto>builder()
                 .message("Job updated successfully")
                 .data(job)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('RECRUITER')")
+    @PatchMapping("/{jobId}/status")
+    public ResponseEntity<ApiResponse<Void>> updateJobStatus(
+            @Valid @RequestBody JobStatusUpdateRequestDto jobStatusUpdateRequestDto,
+            @PathVariable UUID jobId) {
+
+         jobService.updateJobStatus(jobStatusUpdateRequestDto, jobId);
+
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .message("Job status updated successfully")
                 .build();
 
         return ResponseEntity.ok(response);

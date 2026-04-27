@@ -1,6 +1,7 @@
 package com.ayush.jobboard.repository;
 
 import com.ayush.jobboard.entity.Job;
+import com.ayush.jobboard.enums.JobStatus;
 import com.ayush.jobboard.enums.JobType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,8 @@ public interface JobRepository extends JpaRepository<Job , UUID> {
 
     @Query("""
     SELECT j FROM Job j
-    WHERE (:search IS NULL OR LOWER(j.title) LIKE %:search%)
+    WHERE j.status = :status
+    AND (:search IS NULL OR LOWER(j.title) LIKE %:search%)
     AND (:location IS NULL OR LOWER(j.location) LIKE %:location%)
     AND (:type IS NULL OR j.type = :type)
     AND (:companyName IS NULL OR j.companyName = :companyName)
@@ -24,6 +26,7 @@ public interface JobRepository extends JpaRepository<Job , UUID> {
     AND (:salaryMax IS NULL OR j.salaryMax <= :salaryMax)
     """)
     Page<Job> filterJobs(
+            JobStatus status,
             String search,
             String location,
             JobType type,

@@ -5,7 +5,10 @@ import com.ayush.jobboard.event.StatusUpdatedEvent;
 import com.ayush.jobboard.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -13,7 +16,9 @@ public class ApplicationEventListener {
 
     private final EmailService emailService;
 
+    @Async
     @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleApplicationCreated(ApplicationCreatedEvent event) {
         var application = event.getApplication();
         var applicant = application.getApplicant();
@@ -43,7 +48,9 @@ public class ApplicationEventListener {
         );
     }
 
+    @Async
     @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleStatusUpdated(StatusUpdatedEvent event) {
         var application = event.getApplication();
         var applicant = application.getApplicant();

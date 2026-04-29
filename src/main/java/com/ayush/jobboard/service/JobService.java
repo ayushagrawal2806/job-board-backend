@@ -9,6 +9,7 @@ import com.ayush.jobboard.entity.SavedJob;
 import com.ayush.jobboard.entity.User;
 import com.ayush.jobboard.enums.ApplicationStatus;
 import com.ayush.jobboard.enums.JobStatus;
+import com.ayush.jobboard.event.ApplicationCreatedEvent;
 import com.ayush.jobboard.exceptions.*;
 import com.ayush.jobboard.mapper.JobMapper;
 import com.ayush.jobboard.repository.ApplicationRepository;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -44,6 +46,7 @@ public class JobService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
     private final SavedJobRespository savedJobRespository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public JobResponseDto createJob(JobRequestDto request) {
 
@@ -175,6 +178,8 @@ public class JobService {
                 .build();
 
         applicationRepository.save(application);
+
+        eventPublisher.publishEvent(new ApplicationCreatedEvent(this, application));
 
     }
 

@@ -55,6 +55,13 @@
             <version>0.12.6</version>
         </dependency>
 
+
+        <!--email -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- JWT Implementation -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

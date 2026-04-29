@@ -6,11 +6,13 @@ import com.ayush.jobboard.dto.Application.ApplicationUpdateRequestDto;
 import com.ayush.jobboard.entity.Application;
 import com.ayush.jobboard.entity.User;
 
+import com.ayush.jobboard.event.StatusUpdatedEvent;
 import com.ayush.jobboard.exceptions.ResourceNotFoundException;
 import com.ayush.jobboard.exceptions.UnAuthorizedException;
 import com.ayush.jobboard.repository.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,6 +29,7 @@ import static com.ayush.jobboard.util.AppUtils.getCurrentUser;
 @RequiredArgsConstructor
 public class ApplicationService {
     private final ApplicationRepository applicationRepository;
+    private final ApplicationEventPublisher eventPublisher;
     public Page<ApplicationResponseDto> getMyApplications(Pageable pageable) {
         User applicant = getCurrentUser();
         Page<Application> applications = applicationRepository.findByApplicantId(applicant.getId() , pageable);
@@ -67,6 +70,8 @@ public class ApplicationService {
 
         application.setStatus(requestDto.getStatus());
         applicationRepository.save(application);
+
+        eventPublisher.publishEvent(new StatusUpdatedEvent(this, application, requestDto.getStatus()));
     }
 
     public ApplicationDetailResponseDto getApplicationDetails(UUID applicationId) {

@@ -71,7 +71,7 @@ public class ApplicationService {
         application.setStatus(requestDto.getStatus());
         applicationRepository.save(application);
 
-        eventPublisher.publishEvent(new StatusUpdatedEvent(this, application, requestDto.getStatus()));
+//        eventPublisher.publishEvent(new StatusUpdatedEvent(this, application, requestDto.getStatus()));
     }
 
     public ApplicationDetailResponseDto getApplicationDetails(UUID applicationId) {

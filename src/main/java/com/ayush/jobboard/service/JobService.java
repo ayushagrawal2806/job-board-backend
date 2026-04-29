@@ -179,7 +179,8 @@ public class JobService {
 
         applicationRepository.save(application);
 
-        eventPublisher.publishEvent(new ApplicationCreatedEvent(this, application));
+
+//        eventPublisher.publishEvent(new ApplicationCreatedEvent(this, application));
 
     }
 

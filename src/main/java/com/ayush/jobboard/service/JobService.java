@@ -120,10 +120,18 @@ public class JobService {
 
     public Page<JobResponseDto> filterJobs(JobFilterDto filter, Pageable pageable) {
 
+        String sanitizedSearch = (filter.getSearch() == null || filter.getSearch().isBlank())
+                ? null
+                : filter.getSearch().trim().toLowerCase();
+
+        String sanitizedLocation = (filter.getLocation() == null || filter.getLocation().isBlank())
+                ? null
+                : filter.getLocation().trim().toLowerCase();
+
         Page<Job> jobs = jobRepository.filterJobs(
                 JobStatus.OPEN,
-                filter.getSearch(),
-                filter.getLocation(),
+                sanitizedSearch,
+                sanitizedLocation,
                 filter.getType(),
                 filter.getCompanyName(),
                 filter.getSalaryMin(),
